@@ -11,7 +11,7 @@ const { Payment, Card } = require("./models");
 const { settlePaymentToSeller } = require("./controllers/payment.controller");
 const { wallet } = require("./utils/blockchain");
 const { Op } = require("sequelize");
-
+const rateLimit = require('express-rate-limit');
 const app = express();
 app.set("trust proxy", 1);
 
@@ -54,8 +54,18 @@ app.use((req, res, next) => {
   });
 });
 
-app.use(express.static(__dirname));
 
+// Define a general rate limiter
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+app.use(express.static(__dirname));
+app.use(globalLimiter);
 // Routes
 app.use("/auth", require("./routes/auth.routes"));
 app.use("/buyer", require("./routes/buyer.routes"));

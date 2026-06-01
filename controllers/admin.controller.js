@@ -3,7 +3,7 @@ const { parseAmount } = require("../utils/helpers");
 const { refundPaymentByLookup } = require("./payment.controller");
 const { transferFunds } = require("../utils/blockchain");
 const fs = require("fs");
-
+const path = require("path");
 exports.approveCard = async (req, res) => {
   try {
     const card = await Card.findByPk(req.params.id);
@@ -40,15 +40,26 @@ exports.addCard = async (req, res) => {
     const amount = parseAmount(price);
 
     if (!name || !amount || !req.file) {
-      if (req.file?.path) fs.unlink(req.file.path, () => undefined);
+      if (req.file && req.file.path) {
+        // Resolve the local absolute path and apply a folder guard
+        const resolvedPath = path.resolve(req.file.path);
+        const allowedDirectory = path.resolve(__dirname, "../uploads");
+
+        if (resolvedPath.startsWith(allowedDirectory)) {
+          fs.unlink(resolvedPath, () => undefined);
+        }
+      }
       return res.status(400).json({ error: "name, price and file are required." });
     }
+
+    const safeFilename = path.basename(req.file.filename || req.file.path);
+    const secureDatabasePath = path.join("uploads", safeFilename);
 
     const card = await Card.create({
       name: name.trim(),
       description: description.trim(),
       price: amount,
-      file_path: req.file.path,
+      file_path: secureDatabasePath,
       status: "active",
     });
 

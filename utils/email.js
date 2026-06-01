@@ -19,9 +19,12 @@ async function sendEmail({ to, subject, text, html }) {
       text,
       html,
     });
-    console.log(`[EMAIL] Sent to ${to}: ${subject}`);
+    // Fix: Explicitly pass strings to avoid evaluation as a format-template string
+    console.log("%s", `[EMAIL] Sent to ${to}: ${subject}`);
   } catch (error) {
-    console.error(`[EMAIL ERROR] Failed to send to ${to}:`, error.message);
+    // Fix: Force string-safe formatting explicitly so parameters cannot be weaponized
+    console.error("%s", `[EMAIL ERROR] Failed to send to ${to}: ${error.message}`);
+    
     // Don't throw if email fails in dev, but log it
     if (process.env.NODE_ENV === 'production') throw error;
   }

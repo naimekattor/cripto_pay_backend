@@ -2,6 +2,7 @@ const { Card, Payment, Setting } = require("../models");
 const { parseAmount } = require("../utils/helpers");
 const { Op } = require("sequelize");
 const fs = require("fs");
+const path = require("path");
 
 exports.getCards = async (req, res) => {
   if (req.user.role !== "seller")
@@ -127,7 +128,7 @@ exports.sellCard = async (req, res) => {
       price: buyerPays, // The price the buyer actually pays
       seller_asking_price: amount, // The face value of the card
       denomination: amount,
-      file_path: req.file ? `uploads/${req.file.filename}` : "",
+      file_path: req.file ? path.join("uploads", path.basename(req.file.filename)) : "",
       status: status,
       retailer,
       card_code,

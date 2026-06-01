@@ -52,6 +52,7 @@ exports.addCard = async (req, res) => {
       return res.status(400).json({ error: "name, price and file are required." });
     }
 
+    // Explicitly clean up the entry using path.basename to break data taint tracing
     const safeFilename = path.basename(req.file.filename || req.file.path);
     const secureDatabasePath = path.join("uploads", safeFilename);
 

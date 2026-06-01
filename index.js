@@ -64,7 +64,7 @@ const globalLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
 });
 
-app.use(express.static(__dirname));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(globalLimiter);
 // Routes
 app.use("/auth", require("./routes/auth.routes"));

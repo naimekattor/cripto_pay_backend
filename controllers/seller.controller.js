@@ -67,7 +67,11 @@ exports.sellCard = async (req, res) => {
     const amount = parseAmount(price);
 
     if (!retailer || !amount || !card_code || !seller_wallet_address) {
-      if (req.file?.path) fs.unlink(req.file.path, () => undefined);
+     if (req.file?.filename) {
+        // Construct a safe absolute or relative path using only the safe filename
+        const safePath = path.join(__dirname, "../uploads", path.basename(req.file.filename));
+        fs.unlink(safePath, () => undefined);
+      }
       return res.status(400).json({ error: "retailer, price, card_code and seller_wallet_address are required." });
     }
 

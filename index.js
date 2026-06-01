@@ -64,8 +64,11 @@ const globalLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
 });
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(globalLimiter);
+app.use('/uploads', express.static(path.resolve(__dirname, 'uploads'), {
+  dotfiles: 'ignore',
+  index: false
+}));app.use(globalLimiter);
+
 // Routes
 app.use("/auth", require("./routes/auth.routes"));
 app.use("/buyer", require("./routes/buyer.routes"));

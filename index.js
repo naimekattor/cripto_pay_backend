@@ -67,7 +67,13 @@ const globalLimiter = rateLimit({
 app.use('/uploads', express.static(path.resolve(__dirname, 'uploads'), {
   dotfiles: 'ignore',
   index: false
-}));app.use(globalLimiter);
+}));
+
+app.get('/admin_logo.png', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'admin_logo.png'));
+});
+
+app.use(globalLimiter);
 
 // Routes
 app.use("/auth", require("./routes/auth.routes"));
